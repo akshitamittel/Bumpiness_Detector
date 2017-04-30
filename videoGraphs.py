@@ -10,44 +10,15 @@ import collections
 
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'movieName', 'MBHx', 'MBHy', 'labels', 'cluster' 'outputDirectory']
-args = dict(zip(arg_names, sys.argv))
-Arg_list = collections.namedtuple('Arg_list', arg_names)
-args = Arg_list(*(args.get(arg, None) for arg in arg_names))
-
-for (idx,arg) in enumerate(args):
-    if arg == None:
-        print "Error: "+ arg_names[idx] + " is None."
-        print "Correct usage: $python videoGraphs.py movieName MBHx MBHy labels outputDirectory"
-        sys.exit()
-
-# Get the movie and output directories
-filename = sys.argv[1]
-newDirectory = sys.argv[6] + '/'
-if not os.path.exists(newDirectory):
-    os.makedirs(newDirectory)
-
-# Capture the video and get information
-cap = cv2.VideoCapture(filename)
-frames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-width  = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
-height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
-fps = int(cap.get(cv2.cv.CV_CAP_PROP_FPS))
-labels = list(np.load(sys.argv[4]))
-print labels
-
-print fps
-print frames
-
-# Label sorting
-print "Getting clusters"
-clusters = np.load(sys.argv[5])
-clusters = np.swapaxes(clusters, 0, 1)
-x_clusters = clusters[0]
-print ("x", x_clusters)
-bumplevel = np.argsort(x_clusters, axis=0)
-print ("bumplevel", bumplevel)
-print "\n"
+parser = argparse.ArgumentParser()
+parser.add_argument("--movieName", default="Movie1.mp4")
+parser.add_argument("--MBHx", default="MBHxAggFeatures.npy")
+parser.add_argument("--MBHy", default="MBHyAggFeatures.npy")
+parser.add_argument("--labelFile", default="labels.npy")
+parser.add_argument("--clusterFile", default="clusters.npy")
+parser.add_argument("--outputDirectory", default="outputVideo")
+parser.add_argument("--environ", default="test")
+args = parser.parse_args()
 
 def concat_images(imga, imgb):
     """
@@ -102,49 +73,77 @@ def getFrameAttributes(i):
             return True, "Minor Disturbance", (0, 255, 255)
     return False, None, None
 
+if args.environ == "dep":
+    # Get the movie and output directories
+    filename = args.movieName
+    newDirectory = args.outputDirectory + '/'
+    if not os.path.exists(newDirectory):
+        os.makedirs(newDirectory)
 
-fig, ax = plt.subplots(1,1)
+    # Capture the video and get information
+    cap = cv2.VideoCapture(filename)
+    frames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+    width  = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_WIDTH))
+    height = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT))
+    fps = int(cap.get(cv2.cv.CV_CAP_PROP_FPS))
+    labels = list(np.load(args.labelFile))
+    print labels
 
-y_MBHy = np.load(sys.argv[3])
-y_MBHx = np.load(sys.argv[2])
-x_MBHy = range(len(y_MBHy))
-x_MBHx = range(len(y_MBHx))
+    print fps
+    print frames
 
-idx = 0
-for i in range(frames):
-    fig.clf()
-    flag, frame = cap.read()
-    print i
-    if i%fps == 0:
-    	idx += 1
+    # Label sorting
+    print "Getting clusters"
+    clusters = np.load(args.clusterFile)
+    clusters = np.swapaxes(clusters, 0, 1)
+    x_clusters = clusters[0]
+    print ("x", x_clusters)
+    bumplevel = np.argsort(x_clusters, axis=0)
+    print ("bumplevel", bumplevel)
+    print "\n"
 
-    # Put the labels according to the attributes.
-    height, width = frame.shape[:2]
-    flag1, string, color = getFrameAttributes(idx-1)
-    if flag1:
-        print string,color
-        cv2.putText(frame, string, (width-750, 70), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 3)
+    fig, ax = plt.subplots(1,1)
 
-    #Prepare the graph
-    plt.plot(x_MBHy[:idx],y_MBHy[:idx])
-    plt.axis([0, 60, 0, 10])
-    plt.plot(x_MBHx[:idx],y_MBHx[:idx])
-    plt.axis([0, 60, 0, 10])    
-    ax.set_xlabel('time')
-    ax.set_ylabel('MBHy/MBHx (Bumpiness Estimate)')
-    #Convert a plot into an image
-    buffer_ = StringIO()
-    plt.savefig(buffer_, format = "png")
-    buffer_.seek(0)
-    graph = PIL.Image.open(buffer_)
-    #Concactenate images
-    img = concat_images(frame,graph)
-    buffer_.close()
-    image = "000"
-    image += str(i+1)
-    im = Image.fromarray(img)
-    #Save the image in the directory provided.
-    im.save(newDirectory+"image"+image[-4:]+".jpeg")
+    y_MBHy = np.load(args.MBHy)
+    y_MBHx = np.load(args.MBHx)
+    x_MBHy = range(len(y_MBHy))
+    x_MBHx = range(len(y_MBHx))
 
-    if cv2.waitKey(1) == 27:
-        break
+    idx = 0
+    for i in range(frames):
+        fig.clf()
+        flag, frame = cap.read()
+        print i
+        if i%fps == 0:
+        	idx += 1
+
+        # Put the labels according to the attributes.
+        height, width = frame.shape[:2]
+        flag1, string, color = getFrameAttributes(idx-1)
+        if flag1:
+            print string,color
+            cv2.putText(frame, string, (width-750, 70), cv2.FONT_HERSHEY_SIMPLEX, 2, color, 3)
+
+        #Prepare the graph
+        plt.plot(x_MBHy[:idx],y_MBHy[:idx])
+        plt.axis([0, 60, 0, 10])
+        plt.plot(x_MBHx[:idx],y_MBHx[:idx])
+        plt.axis([0, 60, 0, 10])    
+        ax.set_xlabel('time')
+        ax.set_ylabel('MBHy/MBHx (Bumpiness Estimate)')
+        #Convert a plot into an image
+        buffer_ = StringIO()
+        plt.savefig(buffer_, format = "png")
+        buffer_.seek(0)
+        graph = PIL.Image.open(buffer_)
+        #Concactenate images
+        img = concat_images(frame,graph)
+        buffer_.close()
+        image = "000"
+        image += str(i+1)
+        im = Image.fromarray(img)
+        #Save the image in the directory provided.
+        im.save(newDirectory+"image"+image[-4:]+".jpeg")
+
+        if cv2.waitKey(1) == 27:
+            break

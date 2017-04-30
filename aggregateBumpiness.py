@@ -3,19 +3,19 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager
 import sys
 import collections
+import argparse
+
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'featureFile', 'outputFile']
-args = dict(zip(arg_names, sys.argv))
-Arg_list = collections.namedtuple('Arg_list', arg_names)
-args = Arg_list(*(args.get(arg, None) for arg in arg_names))
+parser = argparse.ArgumentParser()
+parser.add_argument("--featureFile", default="MBHxFeatures.npy")
+parser.add_argument("--outputFile", default="MBHxAggFeatures.npy")
+parser.add_argument("--environ", default="test")
+args = parser.parse_args()
+print args
 
-for (idx,arg) in enumerate(args):
-	if arg == None:
-		print "Error: "+ arg_names[idx] + " is None."
-		print "Correct usage: $python aggregateBumpiness.py featureFile outputFile"
-		sys.exit()
-
+global bumpiness
+global aggBumpiness
 
 bumpiness = []
 aggBumpiness = []
@@ -23,8 +23,6 @@ aggBumpiness = []
 # Lamda functions to scale the bumpiness values.
 f = lambda a: a if (a > 0) else 0
 g = lambda a: a*10000/25
-
-
 
 def addArray(arr):
 	'''
@@ -44,6 +42,7 @@ def createCollection(collection):
 	'''
 	for item in collection:
 		bumpiness.append(item[:10])
+	return bumpiness
 
 def writeAggregatedFeatures(outputFile, bumpinessAggregate):
 	'''
@@ -57,6 +56,8 @@ def aggregate(bumpiness):
 	This funciton is where the main overlapping takes place. 
 	Each video sentence is overlapped by 5 seconds.
 	'''
+	global aggBumpiness
+	aggBumpiness = []
 	for idx,bumps in enumerate(bumpiness):
 		if idx == 0:
 			addArray(bumpiness[idx][:5])
@@ -66,23 +67,32 @@ def aggregate(bumpiness):
 			addArrayAverage(bumpiness[idx][5:], bumpiness[idx+1][:5])
 	return aggBumpiness
 
-def scaleAggregates():
+def scaleAggregates(arr):
 	'''
 	This function scales up the aggregates using tha lambda functions defined above.
 	'''
-	minVal = min(aggBumpiness)
+	try:
+		minVal = min(arr)
+	except ValueError:
+		return None
 	print minVal
 	thres = minVal + 0.0625
-	aggBumpiness[:] = [x - thres for x in aggBumpiness]
-	aggBumpiness = map(f,aggBumpiness)
-	aggBumpiness = map(g,aggBumpiness)
-	
-#Load the feature files
-createCollection(np.load(sys.argv[1]))
-#Aggregate the features by overlap.
-aggregate(bumpiness)
-#Scale the aggregates to 1-10
-scaleAggregates()
-#Write the aggregated features to feature file to be used for clustering.
-writeAggregatedFeatures(sys.argv[2],aggBumpiness)
-print aggBumpiness
+	arr[:] = [x - thres for x in arr]
+	arr = map(f,arr)
+	arr = map(g,arr)
+	print arr
+	return arr
+
+if args.environ == "dep":
+	print "Deploying algorithm..."	
+	#Load the feature files
+	createCollection(np.load(args.featureFile))
+	print bumpiness
+	#Aggregate the features by overlap.
+	aggregate(bumpiness)
+	#Scale the aggregates to 1-10
+	aggBumpiness = scaleAggregates(aggBumpiness)
+	print aggBumpiness
+	#Write the aggregated features to feature file to be used for clustering.
+	writeAggregatedFeatures(args.outputFile, aggBumpiness)
+	print ("Here", aggBumpiness)

@@ -18,12 +18,16 @@ def getMBHfeatures(dirName, movie):
 			continue
 		number = filename[5:-4]
 		featureName = number + ".features"
-		subprocess.check_call(['python', 'bumpiness.py', featureName, filename, "MBHxFeatures.npy", "0"])
-		subprocess.check_call(['python', 'bumpiness.py', featureName, filename, "MBHyFeatures.npy", "1"])
+		cmd_y =  "python bumpiness.py --videoName=" + filename + " --featureFile=" + featureName + " --featureOutputFile==MBHyFeatures.npy --feature=0 --environ=dep"
+		cmd_x =  "python bumpiness.py --videoName=" + filename + " --featureFile=" + featureName + " --featureOutputFile==MBHxFeatures.npy --feature=1 --environ=dep"
+		subprocess.check_call([cmd_y], shell=True)
+		subprocess.check_call([cmd_x], shell=True)
 
 def getMBHAggregate():
-	subprocess.check_call(['python', 'aggregateBumpiness.py', "MBHxFeatures.npy", "MBHxAggFeatures.npy"])
-	subprocess.check_call(['python', 'aggregateBumpiness.py', "MBHyFeatures.npy", "MBHyAggFeatures.npy"])
+	cmd_y = "python aggregateBumpiness.py --featureFile=MBHyFeatures.npy --outputFile=MBHyAggFeatures.npy --environ=dep"
+	cmd_x = "python aggregateBumpiness.py --featureFile=MBHxFeatures.npy --outputFile=MBHxAggFeatures.npy --environ=dep"
+	subprocess.check_call([cmd_y], shell=True)
+	subprocess.check_call([cmd_x], shell=True)
 
 def make(movie):
 	#Get the features in the features file
@@ -36,11 +40,13 @@ def make(movie):
     #Get aggregate MBH features
     getMBHAggregate()
     #Get k-means labels and clusters
-    subprocess.check_call(['python', 'clusterBumpiness.py', "MBHxAggFeatures.npy", "MBHyAggFeatures.npy", "labels.npy", "clusters.npy"])
+    cmd = "python clusterBumpiness.py --MBHx=MBHxAggFeatures.npy --MBHy=MBHyAggFeatures.npy --labelFile=labels.npy --clusterOutfile=clusters.npy --environ=dep"
+    subprocess.check_call([cmd], shell=True)
     #Get video labels
     if not os.path.exists("outputVideo"):
     	os.makedirs("outputVideo")
-    subprocess.check_call(['python', 'videoGraphs.py', sys.argv[3], "MBHxAggFeatures.npy", "MBHyAggFeatures.npy", "labels.npy", "clusters.npy", "outputVideo"])
+    cmd = "python videoGraphs.py --movieName=" + sys.argv[3] + " --MBHx=MBHxAggregateFeatures.npy --MBHy=MBHyAggregateFeatures.npy --labelFile=labels.npy --outputDirectory=outputVideo --environ=dep"
+    subprocess.check_call([cmd], shell=True)
     #Make video
     subprocess.call('ffmpeg -r 29 -f image2 -s 1920x1080 -i image%04d.jpeg -vcodec libx264 -crf 25  -pix_fmt yuv420p test.mp4', cwd="outputVideo", shell=True)
 

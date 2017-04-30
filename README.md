@@ -48,25 +48,25 @@ Run the following code to collect features:
 1. Getting the bumpiness values (use this code twice, to get both the MBHx (feature == 0) and MBHy (feature == 1) :
 
 ```
-$python bumpiness.py videoName featureFile featureOutputFile feature
+$python bumpiness.py --videoName=movie0-10.mp4 --featureFile=0-10.features --featureOutputFile==MBHyFeatures.npy --feature=0 --environ=dep
 ```
 
 2. Aggregating the bumpiness across the videos (for both X and Y).
 
 ```
-$python aggregateBumpiness.py featureOutputFile featureAggregateOutputFile
+$python aggregateBumpiness.py --featureFile=MBHyFeatures.npy --outputFile=MBHyAggFeatures.npy --environ=dep
 ```
 
 3. Getting the labels of the video through K-means clustering:
 
 ```
-$python clusterBumpiness.py MBHxFeatures MBHyFeatures labelsOutfile clusterOutfile
+$python clusterBumpiness.py --MBHx=MBHxAggFeatures.npy --MBHy=MBHyAggFeatures.npy --labelFile=labels.npy --clusterOutfile=clusters.npy --environ=dep
 ```
 
 4. Plotting the graph and labels on the video:
 
 ```
-$python videoGraphs.py movieName MBHxAggregateFeatures MBHyAggregateFeatures labels outputDirectory
+$python videoGraphs.py --movieName=Movie1.mp4 --MBHx=MBHxAggregateFeatures.npy --MBHy=MBHyAggregateFeatures.npy --labelFile=labels.npy --outputDirectory=outputVideo --environ=dep
 ```
 
 5. Go to the output Directory of step 4 and run the following command to get the video named "test.mp4":
