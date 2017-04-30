@@ -40,7 +40,7 @@ $ cd dense_trajectory_release_v1.2
 Run the following code to collect features: 
 
 ```
-./release/DenseTrack ./path_to_video | gzip > /path_to_output_directory/out.features
+./release/DenseTrack ./path_to_video > /path_to_output_directory/out.features
 ```
 
 #### The Bumpiness Detector
@@ -93,8 +93,39 @@ $pylint filename.py (eg. bumpiness.py)
 
 ## Deployment
 
-TODO
+### Initialization
+1. Place the video in the working directory.
+2. Place the video sentences in a subdirectory.
+Each video sentence should follow the following naming convention:
 
+```
+movieStartTime_EndTime.mp4
+```
+
+Examples:
+
+```
+movie0-10.mp4
+movie5-14.mp4
+
+...
+movie50-60.mp4
+```
+### Running the script
+
+1. To run the entire script do:
+
+```
+$python script.py make videoSentence_directory video
+
+```
+Your video should be in the directory outputVideo with the name test.mp4
+
+2. To clean up after the code is used:
+
+```
+$python script.py clean
+```
 
 ## Authors
 1. [Akhita Mittel](https://github.com/akshitamittel) (cs13b1040@iith.ac.in)
