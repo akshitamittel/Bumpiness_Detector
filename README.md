@@ -60,7 +60,7 @@ $python aggregateBumpiness.py featureOutputFile featureAggregateOutputFile
 3. Getting the labels of the video through K-means clustering:
 
 ```
-$python clusterBumpiness.py
+$python clusterBumpiness.py MBHxFeatures MBHyFeatures labelsOutfile clusterOutfile
 ```
 
 4. Plotting the graph and labels on the video:
@@ -97,6 +97,8 @@ TODO
 
 
 ## Authors
-[Akhita Mittel](https://github.com/akshitamittel) (cs13b1040@iith.ac.in)
-[Naveen Chedeti](https://github.com/chedeti) (cs13b1010@iith.ac.in)
-Prashanth Dewangan (cs13b1025@iith.ac.in)
+1. [Akhita Mittel](https://github.com/akshitamittel) (cs13b1040@iith.ac.in)
+
+2. [Naveen Chedeti](https://github.com/chedeti) (cs13b1010@iith.ac.in)
+
+3. Prashanth Dewangan (cs13b1025@iith.ac.in)

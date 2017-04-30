@@ -7,7 +7,7 @@ import math
 import sys
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'videoName', 'featureFile', 'outputFile']
+arg_names = ['code', 'videoName', 'featureFile', 'outputFile', 'feature']
 args = dict(zip(arg_names, sys.argv))
 Arg_list = collections.namedtuple('Arg_list', arg_names)
 args = Arg_list(*(args.get(arg, None) for arg in arg_names))
@@ -15,7 +15,7 @@ args = Arg_list(*(args.get(arg, None) for arg in arg_names))
 for (idx,arg) in enumerate(args):
 	if arg == None:
 		print "Error: "+ arg_names[idx] + " is None."
-		print "Correct usage: $python bumpiness.py videoName featureFile outputFile"
+		print "Correct usage: $python bumpiness.py videoName featureFile outputFile feature"
 		sys.exit()
 
 # Get the input video and feature file names
@@ -27,7 +27,10 @@ denseFeatures = featureDirectory + args[2]
 # Set variables
 thresholdAgg = -10
 thresholdFrames = -10
+feature = int(sys.argv[4])
 getFeats = [0,0,0,1,0]
+if feature == 0:
+	getFeats = [0,0,1,0,0]
 seconds = 10
 
 # Get video information
@@ -147,7 +150,7 @@ def getCollectedFeatureAggregates(denseFeatures, getFeats):
 		frameAggregates.extend(aggregates)
 	return frameAggregates
 
-def writeDenseFeatures(outputFile,bumpinessAggregate):
+def writeDenseFeatures(outputFile, bumpinessAggregate):
 	agg = []
 	try:
     	with open(filename) as file:
@@ -157,11 +160,11 @@ def writeDenseFeatures(outputFile,bumpinessAggregate):
 			agg = np.asarray(addArray[:seconds])
 	np.save(outputFile,agg)
 
-#Get the MBHy descriptor.
+#Get the MBHy/MBHx descriptor.
 descriptors, frames = getData(denseFeatures, getFeats)
 #Find the bumpiness per frame.
 frameAggregates = getFeatureAggregates(descriptors,frames,thresholdAgg)
 #Find the bumpiness per second.
 bumpinessAggregate = getBumpiness(frameAggregates,thresholdFrames,fps)
 #Append the features into the numpy file.
-writeDenseFeatures(args[3],bumpinessAggregate)
+writeDenseFeatures(sys.argv[3],bumpinessAggregate)
