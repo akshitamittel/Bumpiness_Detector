@@ -78,8 +78,12 @@ ffmpeg -r 29 -f image2 -s 1920x1080 -i image%04d.jpeg -vcodec libx264 -crf 25  -
 
 ## Running the tests
 
-TODO
+The tests for this project are written in the directory unitTests. To run them use the following command:
 
+```
+$python test.py
+```
+Where test is the name of the test in the given directory.
 
 ### And coding style tests
 
