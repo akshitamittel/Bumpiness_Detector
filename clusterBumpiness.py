@@ -7,7 +7,7 @@ import collections
 
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'MBHx', 'MBHy', 'labelsOutfile', 'clusterOutfile' 'outputDirectory']
+arg_names = ['code', 'MBHx', 'MBHy', 'labelsOutfile', 'clusterOutfile']
 args = dict(zip(arg_names, sys.argv))
 Arg_list = collections.namedtuple('Arg_list', arg_names)
 args = Arg_list(*(args.get(arg, None) for arg in arg_names))
@@ -73,7 +73,7 @@ def plot_kMeans(X,labels):
 		elif labels[idx] == 2:
 			# print str(idx) + " :2 Here"
 			plt.scatter(i[0],i[1],c='g',marker='o')
-	plt.show()
+	# plt.show()
 
 
 def smoothen(elem, idx, arr, rng):
@@ -120,7 +120,7 @@ def plot_Bumpiness(x,y):
 	plt.plot(x_axis,x)
 	plt.plot(x_axis,y)
 	plt.axis([0, 60, 0, 10])
-	plt.show()
+	# plt.show()
 
 
 '''
