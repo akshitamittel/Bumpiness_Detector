@@ -132,4 +132,6 @@ $python script.py clean
 
 2. [Naveen Chedeti](https://github.com/chedeti) (cs13b1010@iith.ac.in)
 
-3. Prashanth Dewangan (cs13b1025@iith.ac.in)
+3. [Prashanth Dewangan](https://github.com/Prashant-Dewangan) (cs13b1025@iith.ac.in)
+
+4. [Anudeepthi Koppula](https://github.com/Anudeepthi) (cs13b1019@iith.ac.in)
