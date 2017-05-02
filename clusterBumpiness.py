@@ -7,19 +7,16 @@ import collections
 
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'MBHx', 'MBHy', 'labelsOutfile', 'clusterOutfile']
-args = dict(zip(arg_names, sys.argv))
-Arg_list = collections.namedtuple('Arg_list', arg_names)
-args = Arg_list(*(args.get(arg, None) for arg in arg_names))
+parser = argparse.ArgumentParser()
+parser.add_argument("--MBHx", default="MBHxAggFeatures.npy")
+parser.add_argument("--MBHy", default="MBHyAggFeatures.npy")
+parser.add_argument("--labelFile", default="labels.npy")
+parser.add_argument("--clusterFile", default="clusters.npy")
+parser.add_argument("--environ", default="test")
+args = parser.parse_args()
 
-for (idx,arg) in enumerate(args):
-    if arg == None:
-        print "Error: "+ arg_names[idx] + " is None."
-        print "Correct usage: $python clusterBumpiness.py MBHxFeatures MBHyFeatures labelsOutfile clusterOutfile"
-        sys.exit()
-
-x_data = np.load(sys.argv[1])
-y_data = np.load(sys.argv[2])
+x_data = np.load(args.MBHx)
+y_data = np.load(args.MBHy)
 bach = 3
 
 def f(x, num, den):
@@ -122,23 +119,23 @@ def plot_Bumpiness(x,y):
 	plt.axis([0, 60, 0, 10])
 	# plt.show()
 
-
-'''
-Reiterate the smoothening and clustering process to get a better estimate of bumpiness during turns.
-'''
-for i in range(bach):
-	X, MBHx, MBHy = loadData(x_data,y_data)
-	print ("kMeans", i)
-	clusters, labels, X = kMeans(X,i)
-	# This saves the labels and cluster centres for the initial iteration.
-	# The non-smoothed labels are used to display and catergorise situations in the demo Video.
-	if i == 0:
-		np.save(sys.argv[3], labels)
-		np.save(sys.argv[4], clusters)
-		print ("cluster centres", clusters)
-	plot_kMeans(X,labels)
-	print("smoothen", i)
-	x, y = smoothenPlot(MBHx.tolist(), MBHy.tolist(), labels)
-	x_data = np.asarray(x)
-	y_data = np.asarray(y)
-	plot_Bumpiness(x,y)
+if args.environ == "dep":
+	'''
+	Reiterate the smoothening and clustering process to get a better estimate of bumpiness during turns.
+	'''
+	for i in range(bach):
+		X, MBHx, MBHy = loadData(x_data,y_data)
+		print ("kMeans", i)
+		clusters, labels, X = kMeans(X,i)
+		# This saves the labels and cluster centres for the initial iteration.
+		# The non-smoothed labels are used to display and catergorise situations in the demo Video.
+		if i == 0:
+			np.save(args.labelFile, labels)
+			np.save(args.clusterFile, clusters)
+			print ("cluster centres", clusters)
+		plot_kMeans(X,labels)
+		print("smoothen", i)
+		x, y = smoothenPlot(MBHx.tolist(), MBHy.tolist(), labels)
+		x_data = np.asarray(x)
+		y_data = np.asarray(y)
+		plot_Bumpiness(x,y)

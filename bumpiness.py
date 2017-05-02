@@ -5,31 +5,29 @@ from scipy.io import *
 import cv2
 import math
 import sys
+import argparse
 
 ## Get user inputs and check if they are entered correctly
-arg_names = ['code', 'videoName', 'featureFile', 'outputFile', 'feature']
-args = dict(zip(arg_names, sys.argv))
-Arg_list = collections.namedtuple('Arg_list', arg_names)
-args = Arg_list(*(args.get(arg, None) for arg in arg_names))
-
-for (idx,arg) in enumerate(args):
-	if arg == None:
-		print "Error: "+ arg_names[idx] + " is None."
-		print "Correct usage: $python bumpiness.py videoName featureFile outputFile feature"
-		sys.exit()
+parser = argparse.ArgumentParser()
+parser.add_argument("--videoName", default="movie0-10.mp4")
+parser.add_argument("--featureFile", default="0-10.features")
+parser.add_argument("--outputFile", default="MBHyFeatures.npy")
+parser.add_argument("--feature", default="0")
+parser.add_argument("--environ", default="test")
+args = parser.parse_args()
 
 # Get the input video and feature file names
 videoDirectory = "/media/sdj/Akshita/"
 featureDirectory = "/media/sdj/Akshita/"
-vid = videoDirectory + args[1]
-denseFeatures = featureDirectory + args[2]
+vid = videoDirectory + args.videoName
+denseFeatures = featureDirectory + args.featureFile
 
 # Set variables
 thresholdAgg = -10
 thresholdFrames = -10
-feature = int(sys.argv[4])
+feat = int(args.feature)
 getFeats = [0,0,0,1,0]
-if feature == 0:
+if feat == 0:
 	getFeats = [0,0,1,0,0]
 seconds = 10
 
@@ -160,11 +158,12 @@ def writeDenseFeatures(outputFile, bumpinessAggregate):
 			agg = np.asarray(addArray[:seconds])
 	np.save(outputFile,agg)
 
-#Get the MBHy/MBHx descriptor.
-descriptors, frames = getData(denseFeatures, getFeats)
-#Find the bumpiness per frame.
-frameAggregates = getFeatureAggregates(descriptors,frames,thresholdAgg)
-#Find the bumpiness per second.
-bumpinessAggregate = getBumpiness(frameAggregates,thresholdFrames,fps)
-#Append the features into the numpy file.
-writeDenseFeatures(sys.argv[3],bumpinessAggregate)
+if args.environ == "dep":
+	#Get the MBHy/MBHx descriptor.
+	descriptors, frames = getData(denseFeatures, getFeats)
+	#Find the bumpiness per frame.
+	frameAggregates = getFeatureAggregates(descriptors,frames,thresholdAgg)
+	#Find the bumpiness per second.
+	bumpinessAggregate = getBumpiness(frameAggregates,thresholdFrames,fps)
+	#Append the features into the numpy file.
+	writeDenseFeatures(args.outputFile,bumpinessAggregate)
