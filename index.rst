@@ -96,10 +96,12 @@ Contact
 
 1. `Akshita Mittel <https://github.com/akshitamittel>`_ (cs13b1040@iith.ac.in)
 2. `Naveen Reddy Chedeti <https://github.com/chedeti>`_ (cs13b1010@iith.ac.in)
-#. Prashant Dewangan (cs13b1025@iith.ac.in)
+#. `Prashant Dewangan <https://github.com/Prashant-Dewangan>`_ (cs13b1025@iith.ac.in)
+#. `Anudeepthi Koppula <https://github.com/Anudeepthi>`_ (cs13b1019@iith.ac.in)
 
 .. toctree::
    :maxdepth: 2
+
 
 
 Indices and tables
