@@ -43,9 +43,20 @@ Run the following code to collect features:
 ./release/DenseTrack ./path_to_video > /path_to_output_directory/out.features
 ```
 
+You should have 11 feature files in this step:
+
+```
+0-10.features
+5-15.features
+10-20.features
+
+...
+50-60.features
+```
+
 #### The Bumpiness Detector
 
-1. Getting the bumpiness values (use this code twice, to get both the MBHx (feature == 0) and MBHy (feature == 1) :
+1. Getting the bumpiness values (use this code twice, to get both the MBHx (feature == 0) and MBHy (feature == 1) for each feature file extracted in the first step:
 
 ```
 $python bumpiness.py --videoName=movie0-10.mp4 --featureFile=0-10.features --featureOutputFile==MBHyFeatures.npy --feature=0 --environ=dep
