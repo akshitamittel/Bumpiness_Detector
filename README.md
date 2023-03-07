@@ -143,10 +143,10 @@ $python script.py clean
 ```
 
 ## Authors
-1. [Akhita Mittel](https://github.com/akshitamittel) (cs13b1040@iith.ac.in)
+1. [Akshita Mittel](https://github.com/akshitamittel) (cs13b1040@iith.ac.in)
 
 2. [Naveen Chedeti](https://github.com/chedeti) (cs13b1010@iith.ac.in)
 
-3. [Prashanth Dewangan](https://github.com/Prashant-Dewangan) (cs13b1025@iith.ac.in)
+3. [Prashant Dewangan](https://github.com/Prashant-Dewangan) (cs13b1025@iith.ac.in)
 
 4. [Anudeepthi Koppula](https://github.com/Anudeepthi) (cs13b1019@iith.ac.in)
